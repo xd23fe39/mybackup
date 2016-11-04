@@ -18,7 +18,7 @@ script_dir=`dirname $0`
 # RSYNC default options
 #  -a, --archive  archive mode; equals -rlptgoD (no -H,-A,-X)
 RSYNC="`which rsync`"
-RSYNC_DRYRUN='-n'
+RSYNC_DRYRUN='-n --delete'
 RSYNC_OPTS='--archive --verbose'
 RSYNC_EXCLUDE="--exclude-from ~/mybackup.excludes"
 
