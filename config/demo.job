@@ -1,0 +1,8 @@
+# Sample job descriptor file
+# MYBACKUP create job 
+
+# Local Options
+MYBACKUP_PROJECT=$USER
+MYBACKUP_CLIENT=$HOSTNAME
+MYBACKUP_SOURCE=$HOME
+MYBACKUP_EXCLUDE="$MYBACKUP_SOURCE/mybackup.excludes"

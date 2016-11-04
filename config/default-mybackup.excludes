@@ -1,0 +1,68 @@
+# Ubuntu Homedir Backup Defaults
+[Aa]nwendungen/
+[Aa]rbeitsfläche/
+[Bb]ackup/
+[Dd]esktop/
+[Dd]ownloads/
+[Pp]rogramme/
+[Pp]ublic/
+[Ss]andbox/
+[Tt]emp/
+[Tt]est/
+[Uu]buntu [Oo]ne/
+
+# Ö-Fix
+Öffentlich/
+öffentlich/
+
+# Private and Secrets
+[Pp]rivat/
+[Pp]rivate/
+.[Pp]rivate/
+*.private
+[Ss]ecrets/
+*.secret
+*.passwd
+
+# Hidden files or Hidden directories
+.*
+.*/*
+
+# Temporary files
+~*.*
+*~.*
+*.~*
+*.*~
+
+# Applications
+[Cc]ache*/*
+[Tt]rash*/*
+[Tt]orrent/*
+[Tt]rash*/*
+.[Vv]irtualbox/
+[Cc]alibre*/
+[Dd]ropbox/
+.dropbox*/
+[Oo]wnCloud/
+.owncloud*/
+.thumbnails/*
+*.local/
+.steam/
+
+# Logging
+[Ll]og/
+[Ll]ogging/
+.logfiles/
+*.log
+
+# Disk or Filesystem Images
+*.iso
+*.img
+
+# Known file types
+*.tst
+*.bak
+*.backup
+*.saved
+*.credentials
+
