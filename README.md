@@ -1,7 +1,7 @@
 MyBACKUP Remote Backup Tool
 =============================
 
-MyBACKUP `mybackup` sichert Dateien und Verzeichnisse auf entfernte Datensicherungssysteme, wie z.B. ein FreeNAS-System.
+MyBACKUP `mybackup` sichert Dateien und Verzeichnisse auf entfernten Datensicherungssystemen basierend auf dem Tool `rsync`.
 
 Aufruf
 -------

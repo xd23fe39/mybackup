@@ -9,9 +9,6 @@ SCRIPT_NAME="`basename $0`"
 # BASEDIR setzen
 BASEDIR="`dirname $0`/.."
 
-# Logfile
-LOGFILE="${SCRIPT_NAME}.log"
-
 # Hostname/Nodename holen
 HOSTNAME=$(hostname)
 
@@ -26,7 +23,7 @@ RSYNC_OPTS='--archive --verbose'
 RSYNC_EXCLUDE="--exclude-from ~/mybackup.excludes"
 
 # Set relative to script_dir
-CONFDIR="../config"
+CONFDIR="${SCRIPT_DIR}/config"
 LOGDIR="~"
 
 # Load Backup Host configuration
