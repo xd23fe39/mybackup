@@ -1,2 +1,7 @@
 build
 log/
+.mybackup-init
+.mybackup-server
+.mybackup-job
+.mybackup-excludes
+.mybackup-*
