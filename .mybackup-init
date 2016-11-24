@@ -1,0 +1,16 @@
+export MYBACKUP_HOME="`pwd`"
+export PATH="$PATH:$MYBACKUP_HOME/bin"
+
+alias mybackup="$MYBACKUP_HOME/bin/mybackup.sh"
+
+echo
+echo   "Usage: . ./.mybackup-init"
+echo
+
+if [ -x "$MYBACKUP_HOME/bin/mybackup.sh" ]
+then
+  echo "MYBACKUP is ready."
+else
+  echo "Initialization fails!"
+fi
+echo
