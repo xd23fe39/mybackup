@@ -363,7 +363,7 @@ case "$1" in
 		;;
 	usage|help|*)
 		echo
-		echo "  Usage: mybackup init|get|help|log|push|status|test "
+		echo "  Usage: mybackup [init|get|help|log|push|remote|status|test] "
 		echo
 		echo "  Using: $RSYNC"
 		echo
