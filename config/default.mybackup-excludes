@@ -1,3 +1,21 @@
+# .gitignore
+# Entwicklung
+[Bb]uild
+[Ll]og
+# Backup Dateien
+*.zip
+*.bak
+*.backup
+*.saved
+*.original
+# Deklaratives Ignorieren
+_*
+$*
+&*
+§*
+~*
+
+###
 # Ubuntu Homedir Backup Defaults
 [Aa]nwendungen/
 [Aa]rbeitsfläche/
@@ -65,4 +83,3 @@
 *.backup
 *.saved
 *.credentials
-

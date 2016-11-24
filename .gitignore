@@ -1,6 +1,5 @@
 _*
 build
 log/
-.mybackup-server
-.mybackup-job
-.mybackup-excludes
+.mybackup
+.mybackup/*

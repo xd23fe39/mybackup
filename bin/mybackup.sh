@@ -15,9 +15,12 @@ HOSTNAME=$(hostname)
 # Script directory, eg. /this/is/your/app/bin
 script_dir=`dirname $0`
 
-MYBACKUP_SERVER=".mybackup-server"
-MYBACKUP_JOB=".mybackup-job"
-MYBACKUP_EXCLUDES=".mybackup-excludes"
+# MYBACKUP Project/Job Folder and Files
+MYBACKUP_FOLDER="./.mybackup"
+MYBACKUP_SERVER="$MYBACKUP_FOLDER/server.conf"
+MYBACKUP_JOB="$MYBACKUP_FOLDER/job.conf"
+MYBACKUP_EXCLUDES="$MYBACKUP_FOLDER/excludes.conf"
+MYBACKUP_LOG="$MYBACKUP_FOLDER/mybackup.log"
 
 # RSYNC default options
 #  -a, --archive  archive mode; equals -rlptgoD (no -H,-A,-X)
@@ -30,14 +33,24 @@ RSYNC_EXCLUDE="--exclude-from $MYBACKUP_JOB"
 CONFDIR="${SCRIPT_DIR}/../config"
 LOGDIR="~"
 
+function mkdir_folder
+{
+	if [ ! -d "$MYBACKUP_FOLDER" ]
+	then
+		mkdir -p "$MYBACKUP_FOLDER"
+		return 0
+	fi
+	return 1
+}
+
 # Load Backup Host configuration
 function load_server
 {
-	if [ -f "${1}" ]
+	if [ -f "$MYBACKUP_SERVER" ]
 	then
-		. ${1}
+		. $MYBACKUP_SERVER
 	else
-		echo; echo "  No Backup configuration file found! File: ${1}"; echo
+		echo; echo "  No Backup configuration file found! File: $MYBACKUP_SERVER"; echo
 		exit 1
 	fi
 }
@@ -45,7 +58,7 @@ function load_server
 # Get/Show host configuration
 function get_server
 {
-	load_server "./$MYBACKUP_SERVER"
+	load_server
 	echo
 	echo "   RSYNC Command:  ${RSYNC}"
 	echo "      RSYNC Host:  ${RSYNC_HOST}"
@@ -53,7 +66,7 @@ function get_server
 	echo "   RSYNC Basedir:  ${RSYNC_BASE}"
 	echo "   RSYNC Options:  ${RSYNC_OPTS}"
 	echo
-	echo "        Settings:  ./$MYBACKUP_SERVER"
+	echo "        Settings:  $MYBACKUP_SERVER"
 	echo
 }
 
@@ -76,9 +89,7 @@ MYBACKUP_SERVER=\"$MYBACKUP_SERVER\"
 
 	if [ "$1" == "--save" ]
 	then
-		echo "$JOB" >./.mybackup-job
-		echo "  Saved!"
-		echo
+		echo "$JOB" >$MYBACKUP_JOB
 	fi
 }
 
@@ -106,11 +117,7 @@ RSYNC_ROPTS=\"$RSYNC_OPTS\"
 	if [ "$1" == "--save" ]
 	then
 		echo "$SERVER" > $MYBACKUP_SERVER
-		echo "  Saved!"
-	else
-		echo "  Use: '--save' to create file '$MYBACKUP_SERVER'"
 	fi
-	echo
 }
 
 function create_excludes
@@ -130,12 +137,32 @@ _*
 .git*
 "
 
-	if [ ! -f "./$MYBACKUP_EXCLUDES" ]
+	if [ ! -f "$MYBACKUP_EXCLUDES" ]
 	then
 		echo "$EXCLUDES" >./$MYBACKUP_EXCLUDES
-		echo "  Saved: ./$MYBACKUP_EXCLUDES"; echo
+	fi
+}
+
+function init_project
+{
+	if [ -d "$MYBACKUP_FOLDER" ]
+	then
+		echo; echo "  Project '$MYBACKUP_FOLDER' allready exists!"; echo
+		echo "  Nothing to initialize. Use 'get job'."; echo
+		exit 1
+	fi
+	if [ "$1" == "--save" ]
+	then
+		mkdir_folder
+		create_excludes --save
+		create_job --save
+		create_server --save
+		return 0
 	else
-		echo "  Excludes already exists!"; echo
+		create_job
+		create_server
+		echo; echo "  Use: init [--save]"; echo
+		return 2
 	fi
 
 }
@@ -143,7 +170,7 @@ _*
 # Load Backup job file (search also for mybackup.job if $1 is a directory)
 function load_job
 {
-	JOB=$1
+	JOB=$MYBACKUP_JOB
 	if [ -f "$JOB" ]
 	then
 		. $JOB
@@ -165,7 +192,7 @@ function load_job
 # Show job configuration
 function get_job
 {
-	load_job "./$MYBACKUP_JOB"
+	load_job "$MYBACKUP_JOB"
 	if [ "$?" == "0" ]
 	then
 		echo
@@ -246,23 +273,23 @@ case "$1" in
 		# Create config-File on stdout for backup source $3
 		if [ "$2" == "job" ]
 		then
-			get_job $3
+			get_job
 			exit 0
 		fi
 		if [ "$2" == "server" ]
 		then
-			get_server $3
+			get_server
 			exit 0
 		fi
-		echo; echo "  Use: 'get job | server'"; echo
+		echo; echo "  Use: 'get [job|server]'"; echo
 		exit 1
 		;;
 	log)
-		if [ -f "${2}/mybackup.log" ]
+		if [ -f "$MYBACKUP_LOG" ]
 		then
-			cat ${2}/mybackup.log
+			cat $MYBACKUP_LOG
 		else
-			echo; echo "  No logfile found! File: ${2}/mybackup.log"; echo
+			echo; echo "  No logfile found! File: $MYBACKUP_LOG"; echo
 			exit 1
 		fi
 		;;
@@ -279,7 +306,7 @@ case "$1" in
 			$CMD
 			#### RUNNING RSYNC ####
 			echo "---"
-			echo "[`date '+%Y-%m-%d %H:%M:%S'` - CMD] $CMD"
+			echo "[`date '+%Y-%m-%d %H:%M:%S'` - CMD] $CMD" >>$MYBACKUP_LOG
 			echo "---"
 			echo "OK";
 			exit 0;
@@ -294,8 +321,8 @@ case "$1" in
 		test_server
 		if [ "$?" == "0" ]
 		then
-			load_server "./$MYBACKUP_SERVER"
-	 		load_job "./$MYBACKUP_JOB"
+			load_server
+	 		load_job
 			CMD="$RSYNC $RSYNC_DRYRUN $RSYNC_OPTS --exclude-from ./$MYBACKUP_EXCLUDES $SOURCE_DIR ${RSYNC_USER}@${RSYNC_HOST}:${RSYNC_BASE}/${MYBACKUP_PROJECT}/${MYBACKUP_CLIENT}"
 			$CMD
 			echo "---"
@@ -312,24 +339,8 @@ case "$1" in
 		get_server
 		exit 0
 		;;
-	create)
-		if [ "$2" == "excludes" ]
-		then
-			create_excludes $3
-			exit 0
-		fi
-		if [ "$2" == "job" ]
-		then
-			create_job $3
-			exit 0
-		fi
-		if [ "$2" == "server" ]
-		then
-			create_server $3
-			exit 0
-		fi
-		echo; echo "  Try: create job | server | excludes"; echo
-		exit 1;
+	init)
+		init_project $2
 		;;
 	test)
 		# test call
@@ -352,7 +363,7 @@ case "$1" in
 		;;
 	usage|help|*)
 		echo
-		echo "  Usage: mybackup create|get|help|log|push|status|test "
+		echo "  Usage: mybackup init|get|help|log|push|status|test "
 		echo
 		echo "  Using: $RSYNC"
 		echo
