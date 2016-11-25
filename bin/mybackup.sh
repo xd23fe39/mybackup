@@ -300,13 +300,16 @@ case "$1" in
 		then
 			load_server "./$MYBACKUP_SERVER"
 	 		load_job "./$MYBACKUP_JOB"
-			# TODO: Insert here RSYNC Backup
+			if [ "$2" == "--delete" ]
+			then
+				RSYNC_OPTS="$RSYNC_OPTS --delete"
+			fi
 			CMD="$RSYNC $RSYNC_OPTS --exclude-from $MYBACKUP_EXCLUDES $SOURCE_DIR ${RSYNC_USER}@${RSYNC_HOST}:${RSYNC_BASE}/${MYBACKUP_PROJECT}/${MYBACKUP_CLIENT}"
 			#### RUNNING RSYNC ####
 			$CMD
 			#### RUNNING RSYNC ####
 			echo "---"
-			echo "[`date '+%Y-%m-%d %H:%M:%S'` - CMD] $CMD" >>$MYBACKUP_LOG
+			echo "[`date '+%Y-%m-%d %H:%M:%S'` - CMD] $CMD" | tee $MYBACKUP_LOG
 			echo "---"
 			echo "OK";
 			exit 0;
