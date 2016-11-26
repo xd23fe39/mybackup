@@ -56,7 +56,7 @@ function load_server
 }
 
 # Get/Show host configuration
-function get_server
+function mb_get_server
 {
 	load_server
 	echo
@@ -143,7 +143,7 @@ _*
 	fi
 }
 
-function init_project
+function mb_init_project
 {
 	if [ -d "$MYBACKUP_FOLDER" ]
 	then
@@ -164,7 +164,6 @@ function init_project
 		echo; echo "  Use: init [--save]"; echo
 		return 2
 	fi
-
 }
 
 # Load Backup job file (search also for mybackup.job if $1 is a directory)
@@ -190,7 +189,7 @@ function load_job
 }
 
 # Show job configuration
-function get_job
+function mb_get_job
 {
 	load_job "$MYBACKUP_JOB"
 	if [ "$?" == "0" ]
@@ -211,10 +210,10 @@ function get_job
 	# echo
 }
 
-function func_remote
+function mb_remote
 {
-	load_server "./$MYBACKUP_SERVER"
-	load_job "./$MYBACKUP_JOB"
+	load_server "$MYBACKUP_SERVER"
+	load_job "$MYBACKUP_JOB"
 
 	echo;echo "RSYNC/SSH: $RSYNC_USER@$RSYNC_HOST $1"
 	echo "---"
@@ -233,7 +232,7 @@ function func_remote
 	return $EXIT_CODE
 }
 
-function test_server
+function mb_test_server
 {
 	load_server "./$MYBACKUP_SERVER"
 	EXIT_CODE=0
@@ -261,115 +260,137 @@ function test_server
 	return $EXIT_CODE
 }
 
+function mb_usage {
+	echo
+	echo "  Usage: mybackup [init|get|help|log|push|remote|status|test] "
+	echo
+	echo "  Using: $RSYNC"
+	echo
+}
+
+##
+#
+# http://www.linux-services.org/shell/
+#
+function mb_return {
+	if [ "$?" == "0" ]
+	then
+		echo "OK"
+	else
+		echo "FAILURE"
+		exit $1
+	fi
+}
+
+function mb_get {
+	if [ "$2" == "job" ]
+	then
+		mb_get_job
+		exit 0
+	fi
+	if [ "$2" == "server" ]
+	then
+		mb_get_server
+		exit 0
+	fi
+	echo; echo "  Use: 'get [job|server]'"; echo
+	exit 1
+}
+
+function mb_log {
+	if [ -f "$MYBACKUP_LOG" ]
+	then
+		cat $MYBACKUP_LOG
+	else
+		echo; echo "  No logfile found! File: $MYBACKUP_LOG"; echo
+		exit 1
+	fi
+}
+
+function mb_push {
+	SOURCE_DIR="`pwd`"
+	mb_test_server
+	if [ "$?" == "0" ]
+	then
+		load_server "$MYBACKUP_SERVER"
+		load_job "$MYBACKUP_JOB"
+		if [ "$2" == "--delete" ]
+		then
+			RSYNC_..
+			OPTS="$RSYNC_OPTS --delete"
+		fi
+		CMD="$RSYNC $RSYNC_OPTS --exclude-from $MYBACKUP_EXCLUDES $SOURCE_DIR ${RSYNC_USER}@${RSYNC_HOST}:${RSYNC_BASE}/${MYBACKUP_PROJECT}/${MYBACKUP_CLIENT}"
+		#### RUNNING RSYNC ####
+		$CMD
+		#### RUNNING RSYNC ####
+		echo "---"
+		echo "[`date '+%Y-%m-%d %H:%M:%S'` - CMD] $CMD" | tee -a $MYBACKUP_LOG
+		echo "---"
+		echo "OK";
+		exit 0;
+	else
+		echo "FAILURE";
+		exit 10
+	fi
+}
+
+function mb_status {
+	SOURCE_DIR="`pwd`"
+	# Load backup job descriptor file if exists
+	mb_test_server
+	if [ "$?" == "0" ]
+	then
+		load_server
+		load_job
+		CMD="$RSYNC $RSYNC_DRYRUN $RSYNC_OPTS --exclude-from ./$MYBACKUP_EXCLUDES $SOURCE_DIR ${RSYNC_USER}@${RSYNC_HOST}:${RSYNC_BASE}/${MYBACKUP_PROJECT}/${MYBACKUP_CLIENT}"
+		$CMD
+		echo "---"
+		echo "[`date '+%Y-%m-%d %H:%M:%S'` - CMD] $CMD"
+		echo "---"
+		echo "OK";
+		exit 0;
+	else
+		echo "FAILURE";
+		exit 10
+	fi
+}
+
 #####################################################################
 # MAIN Program
 
 case "$1" in
-	start)
-		;;
-	stop)
-		;;
 	get)
-		# Create config-File on stdout for backup source $3
-		if [ "$2" == "job" ]
-		then
-			get_job
-			exit 0
-		fi
-		if [ "$2" == "server" ]
-		then
-			get_server
-			exit 0
-		fi
-		echo; echo "  Use: 'get [job|server]'"; echo
-		exit 1
+		mb_get $@
 		;;
 	log)
-		if [ -f "$MYBACKUP_LOG" ]
-		then
-			cat $MYBACKUP_LOG
-		else
-			echo; echo "  No logfile found! File: $MYBACKUP_LOG"; echo
-			exit 1
-		fi
+		mb_log
 		;;
 	push)
-		SOURCE_DIR="`pwd`"
-		test_server
-		if [ "$?" == "0" ]
-		then
-			load_server "./$MYBACKUP_SERVER"
-	 		load_job "./$MYBACKUP_JOB"
-			if [ "$2" == "--delete" ]
-			then
-				RSYNC_OPTS="$RSYNC_OPTS --delete"
-			fi
-			CMD="$RSYNC $RSYNC_OPTS --exclude-from $MYBACKUP_EXCLUDES $SOURCE_DIR ${RSYNC_USER}@${RSYNC_HOST}:${RSYNC_BASE}/${MYBACKUP_PROJECT}/${MYBACKUP_CLIENT}"
-			#### RUNNING RSYNC ####
-			$CMD
-			#### RUNNING RSYNC ####
-			echo "---"
-			echo "[`date '+%Y-%m-%d %H:%M:%S'` - CMD] $CMD" | tee $MYBACKUP_LOG
-			echo "---"
-			echo "OK";
-			exit 0;
-		else
-			echo "FAILURE";
-			exit 10
-		fi
+		mb_push $@
 		;;
 	status)
-		SOURCE_DIR="`pwd`"
-		# Load backup job descriptor file if exists
-		test_server
-		if [ "$?" == "0" ]
-		then
-			load_server
-	 		load_job
-			CMD="$RSYNC $RSYNC_DRYRUN $RSYNC_OPTS --exclude-from ./$MYBACKUP_EXCLUDES $SOURCE_DIR ${RSYNC_USER}@${RSYNC_HOST}:${RSYNC_BASE}/${MYBACKUP_PROJECT}/${MYBACKUP_CLIENT}"
-			$CMD
-			echo "---"
-			echo "[`date '+%Y-%m-%d %H:%M:%S'` - CMD] $CMD"
-			echo "---"
-			echo "OK";
-			exit 0;
-		else
-			echo "FAILURE";
-			exit 10
-		fi
+		mb_status $@
 	 	;;
 	host)
-		get_server
-		exit 0
+		mb_get_server $@
 		;;
 	init)
-		init_project $2
+		mb_init_project $2
 		;;
 	test)
 		# test call
-		test_server
-		if [ "$?" == "0" ]
-		then
-			echo "OK"
-		else
-			echo "FAILURE"
-		fi
+		mb_test_server
+		mb_return 3
 		;;
 	remote)
-		func_remote $2
-		if [ "$?" == "0" ]
-		then
-			echo "OK"
-		else
-			echo "FAILURE"
-		fi
+		mb_remote $2
+		mb_return 4
 		;;
 	usage|help|*)
-		echo
-		echo "  Usage: mybackup [init|get|help|log|push|remote|status|test] "
-		echo
-		echo "  Using: $RSYNC"
-		echo
-		exit 0
+		mb_usage
 		;;
 esac
+
+exit 0
+
+# EOL 2016 fe
