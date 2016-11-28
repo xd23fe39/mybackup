@@ -93,6 +93,18 @@ MYBACKUP_SERVER=\"$MYBACKUP_SERVER\"
 	fi
 }
 
+function mb_get_excludes {
+	$OPTIONS="$3"
+	echo
+	echo "  Excludes: ${MYBACKUP_EXCLUDES}"
+	echo
+	echo "---"
+	cat ${MYBACKUP_EXCLUDES}
+	echo "---"
+	echo "EOF"
+	echo
+}
+
 function create_server
 {
 	# Load Default MYBACKUP server template
@@ -191,6 +203,7 @@ function load_job
 # Show job configuration
 function mb_get_job
 {
+	OPTIONS="$3"
 	load_job "$MYBACKUP_JOB"
 	if [ "$?" == "0" ]
 	then
@@ -205,9 +218,10 @@ function mb_get_job
 	else
 		echo "  No Backup Job/Project!"; echo
 	fi
-	# echo "List exclude items:"
-	# cat "$MYBACKUP_EXCLUDE"
-	# echo
+	if [ "$OPTIONS" == "--all" ]
+	then
+		mb_get_server
+	fi
 }
 
 function mb_remote
@@ -283,18 +297,23 @@ function mb_return {
 }
 
 function mb_get {
-	if [ "$2" == "job" ]
-	then
-		mb_get_job
-		exit 0
-	fi
-	if [ "$2" == "server" ]
-	then
-		mb_get_server
-		exit 0
-	fi
-	echo; echo "  Use: 'get [job|server]'"; echo
-	exit 1
+	COMMAND="$2"
+	case "$COMMAND" in
+		job)
+			mb_get_job $@
+		;;
+		server)
+			mb_get_server $@
+		;;
+		excludes)
+			mb_get_excludes $@
+		;;
+		*)
+		echo; echo "  Use: 'get [job|server|excludes]'"; echo
+		exit 1
+		;;
+	esac
+	exit 0
 }
 
 function mb_log {
