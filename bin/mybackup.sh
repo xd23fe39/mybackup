@@ -335,8 +335,7 @@ function mb_push {
 		load_job "$MYBACKUP_JOB"
 		if [ "$2" == "--delete" ]
 		then
-			RSYNC_..
-			OPTS="$RSYNC_OPTS --delete"
+			RSYNC_OPTS="$RSYNC_OPTS --delete"
 		fi
 		CMD="$RSYNC $RSYNC_OPTS --exclude-from $MYBACKUP_EXCLUDES $SOURCE_DIR ${RSYNC_USER}@${RSYNC_HOST}:${RSYNC_BASE}/${MYBACKUP_PROJECT}/${MYBACKUP_CLIENT}"
 		#### RUNNING RSYNC ####
