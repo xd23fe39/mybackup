@@ -1,11 +1,40 @@
 MyBACKUP Remote Backup Tool
 =============================
 
-MyBACKUP `mybackup` sichert Dateien und Verzeichnisse auf entfernten Datensicherungssystemen basierend auf dem Tool `rsync`.
+Das Kommandozeilen-Tool `mybackup` sichert Dateien und Verzeichnisse auf entfernten Datensicherungssystemen basierend auf dem Tool `rsync`.
+
+Ein typisches entferntes System kann z.B. ein FreeNAS-Server mit aktiviertem rsync- und ssh-Deamon (Service)  sein.
 
 Aufruf
 -------
 
-```shell
-  mybackup create|get|help|log|push|status|test
+```
+Usage: mybackup [init|get|help|log|push|remote|status|test]
+
+Using: /usr/bin/rsync
+```
+
+Neues Datensicherungsprojekt anlegen
+-------------------------------------
+
+```
+cd $PROJECT-ROOT
+mybackup init --save
+```
+
+Wird die Option `--save` angegeben, so wird im aktuellen Verzeichnis ein `.mybackup` Projektordner angelegt. Anschließend müssen die JOB- und SERVER-Definitionsdateien noch angepasst werden.
+
+Datensicherung
+---------------
+
+```
+cd $PROJECT-ROOT
+mybackup status
+```
+
+Das Kommando `status` startet einen `rsync`-DryRun.
+
+```
+cd $PROJECT-ROOT
+mybackup push [--delete]
 ```

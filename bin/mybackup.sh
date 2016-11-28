@@ -326,6 +326,14 @@ function mb_log {
 	fi
 }
 
+# ========================================================================
+# Command: push
+#
+# Lädt die JOB- und Server-Definitionsdatei und ruft dann RSYNC
+# auf, um die Datensicherung zu starten.
+#
+# Options: --delete - entfernt verwaiste Dateien im Zielordner
+#
 function mb_push {
 	SOURCE_DIR="`pwd`"
 	mb_test_server
@@ -352,16 +360,24 @@ function mb_push {
 	fi
 }
 
+# ========================================================================
+# Command: status
+#
+# Lädt die JOB-Definitionsdatei und ruft dann RSYNC im Simulationsmodus
+# mit der Option RSYNC_DRYRUN='-n --delete' auf.
+#
 function mb_status {
 	SOURCE_DIR="`pwd`"
-	# Load backup job descriptor file if exists
 	mb_test_server
 	if [ "$?" == "0" ]
 	then
+		# Laden von JOB- und SERVER-Definitionsdatei
 		load_server
 		load_job
+		#### RUNNING RSYNC ####
 		CMD="$RSYNC $RSYNC_DRYRUN $RSYNC_OPTS --exclude-from ./$MYBACKUP_EXCLUDES $SOURCE_DIR ${RSYNC_USER}@${RSYNC_HOST}:${RSYNC_BASE}/${MYBACKUP_PROJECT}/${MYBACKUP_CLIENT}"
 		$CMD
+		#### RUNNING RSYNC ####
 		echo "---"
 		echo "[`date '+%Y-%m-%d %H:%M:%S'` - CMD] $CMD"
 		echo "---"
