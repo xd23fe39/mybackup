@@ -22,7 +22,7 @@ cd $PROJECT-ROOT
 mybackup init --save
 ```
 
-Wird die Option `--save` angegeben, so wird im aktuellen Verzeichnis ein `.mybackup` Projektordner angelegt. Anschließend müssen die JOB- und SERVER-Definitionsdateien noch angepasst werden.
+Die Option `--save` bewirkt, das im aktuellen Verzeichnis ein `.mybackup` Projektordner angelegt wird. Anschließend müssen die JOB- und SERVER-Definitionsdateien noch angepasst werden.
 
 Datensicherung
 ---------------

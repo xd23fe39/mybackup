@@ -33,6 +33,12 @@ RSYNC_EXCLUDE="--exclude-from $MYBACKUP_JOB"
 CONFDIR="${SCRIPT_DIR}/../config"
 LOGDIR="~"
 
+SEPARATOR="---"
+
+function mb_separator {
+	echo $SEPARATOR
+}
+
 function mkdir_folder
 {
 	if [ ! -d "$MYBACKUP_FOLDER" ]
@@ -98,9 +104,9 @@ function mb_get_excludes {
 	echo
 	echo "  Excludes: ${MYBACKUP_EXCLUDES}"
 	echo
-	echo "---"
+	mb_separator
 	cat ${MYBACKUP_EXCLUDES}
-	echo "---"
+	mb_separator
 	echo "EOF"
 	echo
 }
@@ -230,14 +236,14 @@ function mb_remote
 	load_job "$MYBACKUP_JOB"
 
 	echo;echo "RSYNC/SSH: $RSYNC_USER@$RSYNC_HOST $1"
-	echo "---"
+	mb_separator
 
 	#### SSH Command ####
 	ssh "$RSYNC_USER@$RSYNC_HOST" "ls -l $RSYNC_BASE/$MYBACKUP_PROJECT/$MYBACKUP_CLIENT/$1"
 	EXIT_CODE=$?
 	#### SSH Command ####
 
-	echo "---"
+	mb_separator
 	if [ "$EXIT_CODE" != "0" ]
 	then
 		echo "Check ssh login. Use: ssh $RSYNC_USER@$RSYNC_HOST or ssh-copy-id"
@@ -326,6 +332,12 @@ function mb_log {
 	fi
 }
 
+function mb_printc {
+	echo
+	echo "MyBACKUP($COMMAND)... $OPTION $1"
+	echo $SEPARATOR
+}
+
 # ========================================================================
 # Command: push
 #
@@ -336,22 +348,23 @@ function mb_log {
 #
 function mb_push {
 	SOURCE_DIR="`pwd`"
+	mb_printc $SOURCE_DIR
 	mb_test_server
 	if [ "$?" == "0" ]
 	then
 		load_server "$MYBACKUP_SERVER"
 		load_job "$MYBACKUP_JOB"
-		if [ "$2" == "--delete" ]
+		if [ "$1" == "--delete" ]
 		then
-			RSYNC_OPTS="$RSYNC_OPTS --delete"
+			RSYNC_OPTS="$RSYNC_OPTS --delete --force "
 		fi
 		CMD="$RSYNC $RSYNC_OPTS --exclude-from $MYBACKUP_EXCLUDES $SOURCE_DIR ${RSYNC_USER}@${RSYNC_HOST}:${RSYNC_BASE}/${MYBACKUP_PROJECT}/${MYBACKUP_CLIENT}"
 		#### RUNNING RSYNC ####
 		$CMD
 		#### RUNNING RSYNC ####
-		echo "---"
+		mb_separator
 		echo "[`date '+%Y-%m-%d %H:%M:%S'` - CMD] $CMD" | tee -a $MYBACKUP_LOG
-		echo "---"
+		mb_separator
 		echo "OK";
 		exit 0;
 	else
@@ -368,6 +381,7 @@ function mb_push {
 #
 function mb_status {
 	SOURCE_DIR="`pwd`"
+	mb_printc $SOURCE_DIR
 	mb_test_server
 	if [ "$?" == "0" ]
 	then
@@ -378,9 +392,9 @@ function mb_status {
 		CMD="$RSYNC $RSYNC_DRYRUN $RSYNC_OPTS --exclude-from ./$MYBACKUP_EXCLUDES $SOURCE_DIR ${RSYNC_USER}@${RSYNC_HOST}:${RSYNC_BASE}/${MYBACKUP_PROJECT}/${MYBACKUP_CLIENT}"
 		$CMD
 		#### RUNNING RSYNC ####
-		echo "---"
+		mb_separator
 		echo "[`date '+%Y-%m-%d %H:%M:%S'` - CMD] $CMD"
-		echo "---"
+		mb_separator
 		echo "OK";
 		exit 0;
 	else
@@ -391,16 +405,20 @@ function mb_status {
 
 #####################################################################
 # MAIN Program
-
-case "$1" in
+COMMAND=$1
+OPTION=$2
+case "$COMMAND" in
 	get)
 		mb_get $@
 		;;
 	log)
 		mb_log
 		;;
+	cleanup)
+			mb_push $OPTION
+			;;
 	push)
-		mb_push $@
+		mb_push $OPTION
 		;;
 	status)
 		mb_status $@
@@ -409,7 +427,7 @@ case "$1" in
 		mb_get_server $@
 		;;
 	init)
-		mb_init_project $2
+		mb_init_project $OPTION
 		;;
 	test)
 		# test call
@@ -417,7 +435,7 @@ case "$1" in
 		mb_return 3
 		;;
 	remote)
-		mb_remote $2
+		mb_remote $OPTION
 		mb_return 4
 		;;
 	usage|help|*)
