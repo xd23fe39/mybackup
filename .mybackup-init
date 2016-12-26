@@ -1,16 +1,16 @@
+####################################################
+# MABYCKUP Profile Script
+####################################################
+# export MYBACKUP_HOME="$HOME"
 export MYBACKUP_HOME="`pwd`"
 export PATH="$PATH:$MYBACKUP_HOME/bin"
 
 alias mybackup="$MYBACKUP_HOME/bin/mybackup.sh"
 
-echo
-echo   "Usage: . ./.mybackup-init"
-echo
-
 if [ -x "$MYBACKUP_HOME/bin/mybackup.sh" ]
 then
-  echo "MYBACKUP is ready."
+  echo "MYBACKUP is ready on: $MYBACKUP_HOME."
 else
-  echo "Initialization fails!"
+  echo "MYBACKUP: Initialization failure!"
 fi
 echo
