@@ -25,7 +25,7 @@ MYBACKUP_LOG="$MYBACKUP_FOLDER/mybackup.log"
 # RSYNC default options
 #  -a, --archive  archive mode; equals -rlptgoD (no -H,-A,-X)
 RSYNC="`which rsync`"
-RSYNC_DRYRUN='-n --delete'
+RSYNC_DRYRUN='-n --delete --delete-excluded'
 RSYNC_OPTS='--archive --verbose'
 RSYNC_EXCLUDE="--exclude-from $MYBACKUP_JOB"
 
@@ -356,7 +356,7 @@ function mb_push {
 		load_job "$MYBACKUP_JOB"
 		if [ "$1" == "--delete" ]
 		then
-			RSYNC_OPTS="$RSYNC_OPTS --delete --force "
+			RSYNC_OPTS="$RSYNC_OPTS --delete --force --delete-excluded "
 		fi
 		CMD="$RSYNC $RSYNC_OPTS --exclude-from $MYBACKUP_EXCLUDES $SOURCE_DIR ${RSYNC_USER}@${RSYNC_HOST}:${RSYNC_BASE}/${MYBACKUP_PROJECT}/${MYBACKUP_CLIENT}"
 		#### RUNNING RSYNC ####
