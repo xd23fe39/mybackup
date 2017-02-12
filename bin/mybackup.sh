@@ -28,6 +28,7 @@ RSYNC="`which rsync`"
 RSYNC_DRYRUN='-n --delete --delete-excluded'
 RSYNC_OPTS='--archive --verbose'
 RSYNC_EXCLUDE="--exclude-from $MYBACKUP_JOB"
+RSYNC_BASE="/mnt/vol1/users"
 
 # Set relative to script_dir
 CONFDIR="${SCRIPT_DIR}/../config"
