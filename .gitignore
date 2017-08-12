@@ -3,3 +3,5 @@ build
 log/
 .mybackup
 .mybackup/*
+.conf
+.secret
