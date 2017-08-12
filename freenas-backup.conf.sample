@@ -1,0 +1,10 @@
+# Datenquelle, die gesichert werden soll (z.B. FreeNAS Server)
+# FreeNAS Sample: user@freenas:/mnt/vol1/users
+SOURCE_DIR=user@hostname:/your/source-dir
+
+# Ziel der Datensicherung, i.d.R. eine externe Festplatte
+# Sample target: /media/user/externaldrive/freenas
+TARGET_DIR=/media/user/mountpoint/optional-path
+
+# Optionen für RSYNC-Tool (push-Operation)
+RSYNC_OPTS="--archive --verbose"
