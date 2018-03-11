@@ -2,9 +2,12 @@
 # MYBACKUP Profile Script
 ####################################################
 
+# Aktuelles Verzeichnis merken, z.B. /a/b/c/mybackup/bin
+cur_dir=$(pwd)
+
 # set Path to mybackup-Directory
-if [ -f "./bin/mybackup.sh" ]; then
-  export MYBACKUP_HOME="`pwd`"
+if [ -f "./mybackup.sh" ]; then
+  export MYBACKUP_HOME=${cur_dir%%/bin}    # entferne /bin aus Pfad
 elif [ -x "~/mybackup/bin/mybackup.sh" ]; then
   export MYBACKUP_HOME="~/mybackup"
 fi
