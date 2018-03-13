@@ -1,3 +1,6 @@
+#!/usr/bin/env /bin/bash
+#
+# REV.18.0313
 # mybackup.sh
 
 # SCRIPT_DIR setzen

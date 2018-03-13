@@ -1,6 +1,7 @@
 _*
 build
 log/
+test/
 .mybackup
 .mybackup/*
 *.conf

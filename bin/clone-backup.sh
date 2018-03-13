@@ -1,3 +1,8 @@
+#!/usr/bin/env /bin/bash
+#
+# REV.18.0313
+# Kopiere/Klone Backup auf weiteres Zielmedium
+
 # Quellverzeichnis ohne Schrägstrich am Ende angeben
 SOURCE_DIR=user@hostname:/mnt/vol1/users
 
@@ -8,7 +13,7 @@ TARGET_DIR=/media/user/mountName/optional/path
 RSYNC_OPTS="-n --archive --verbose"
 
 # Konfigurationsdatei
-CONFIG="freenas-backup.conf"
+CONFIG="${MYBACKUP_HOME}/etc/clone-backup.conf"
 
 # Überschreiben der Default-Einstellungen per Konfigurationsdatei
 if [ -f "$CONFIG" ]
@@ -31,7 +36,7 @@ else
 	echo
 	echo "Use 'push' for start the real backup procedure!"
 	echo
-	echo "  Usage: ./freenas-backup.sh push "
+	echo "  Usage: ./clone-backup push "
 	echo
 fi
 

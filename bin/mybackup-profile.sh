@@ -1,6 +1,7 @@
-####################################################
-# MYBACKUP Profile Script
-####################################################
+#!/usr/bin/env /bin/bash
+#
+# REV.18.0313
+# Umgebung initialisieren
 
 # Aktuelles Verzeichnis merken, z.B. /a/b/c/mybackup/bin
 cur_dir=$(pwd)
@@ -15,8 +16,11 @@ fi
 # PATH
 export PATH="$PATH:$MYBACKUP_HOME/bin"
 
+# Alias
 alias mybackup="$MYBACKUP_HOME/bin/mybackup.sh"
+alias clone-backup="$MYBACKUP_HOME/bin/clone-backup.sh"
 
+# Ausgabe
 if [ -x "$MYBACKUP_HOME/bin/mybackup.sh" ]
 then
   echo "MYBACKUP is ready on: $MYBACKUP_HOME."
