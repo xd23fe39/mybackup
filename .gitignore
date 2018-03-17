@@ -1,7 +1,8 @@
 _*
-build
+BUILD
+build.out
 log/
-test/
+TEST
 .mybackup
 .mybackup/*
 *.conf
