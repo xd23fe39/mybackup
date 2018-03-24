@@ -3,6 +3,9 @@
 # REV.18.0313
 # mybackup.sh
 
+# Current Directory
+PWD=$(pwd)
+
 # SCRIPT_DIR setzen
 SCRIPT_DIR="`dirname $0`"
 
@@ -25,13 +28,15 @@ MYBACKUP_JOB="$MYBACKUP_FOLDER/job.conf"
 MYBACKUP_EXCLUDES="$MYBACKUP_FOLDER/excludes.conf"
 MYBACKUP_LOG="$MYBACKUP_FOLDER/mybackup.log"
 
-# RSYNC default options
+# RSYNC default values
 #  -a, --archive  archive mode; equals -rlptgoD (no -H,-A,-X)
 RSYNC="`which rsync`"
 RSYNC_DRYRUN='-n --delete --delete-excluded'
 RSYNC_OPTS='--archive --verbose'
 RSYNC_EXCLUDE="--exclude-from $MYBACKUP_JOB"
-RSYNC_BASE="/mnt/vol1/users"
+RSYNC_BASE="${PWD}/../TARGET"
+RSYNC_HOST=localhost
+RSYNC_USER=$USER
 
 # Set relative to script_dir
 CONFDIR="${SCRIPT_DIR}/../config"
@@ -87,9 +92,9 @@ JOB="#!`which bash`
 # `uname -svm`
 #
 # Backup Job Descriptor
-MYBACKUP_PROJECT=$USER
-MYBACKUP_CLIENT=$HOSTNAME
-MYBACKUP_SOURCE=\"`pwd`\"
+MYBACKUP_PROJECT=BACKUP_USER
+MYBACKUP_CLIENT=HOST_NAME
+MYBACKUP_SOURCE=\"${PWD}\"
 MYBACKUP_EXCLUDES=\"$MYBACKUP_EXCLUDES\"
 MYBACKUP_JOB=\"$MYBACKUP_JOB\"
 MYBACKUP_SERVER=\"$MYBACKUP_SERVER\"

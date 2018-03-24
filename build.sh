@@ -12,7 +12,9 @@ CCD="cd $PWD"
 
 function build_init() {
 	${MKDIR} ${BUILD}
-	${MKDIR} ${TEST}
+	${MKDIR} ${TEST}/bin
+	${MKDIR} ${TEST}/SOURCE
+	${MKDIR} ${TEST}/TARGET
 }
 
 function build_cleanup() {
@@ -23,16 +25,25 @@ function build_cleanup() {
 
 function build_all() {
 	build_init $@
-	${CPDIR} ./bin $BUILD/
-	${CCD}/$BUILD/bin
-	. ./mybackup-profile.sh
-	${CCD}/$TEST
-	mybackup.sh
-	mybackup.sh init --save
+	build_test_sourcefileset
+	${CPDIR} ./bin $TEST
+	${CCD}/$TEST/bin
+	. ./mybackup-profile.sh      # set environment 
+	${CCD}/$TEST/SOURCE          # goto SOURCE folder
+	mybackup.sh                  # show Usage of mybackup.sh 
+	echo "Build completed."; echo "Start test workflow using: mybackup init --save"; echo
 }
 
 function build_test() {
 	echo "TEST: $@"; echo
+}
+
+function build_test_sourcefileset() {
+	touch $TEST/SOURCE/file1.tst
+	touch $TEST/SOURCE/file2.tst
+	mkdir $TEST/SOURCE/folder1
+	touch $TEST/SOURCE/folder1/file1.tst
+	touch $TEST/SOURCE/folder1/file2.tst
 }
 
 function build_() {
